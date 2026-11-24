@@ -1,0 +1,354 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global default-deny safety net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- Core Security Primitives ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isVerifiedUser() && request.auth.uid == userId;
+    }
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function userProfileExists(userId) {
+      return exists(/databases/$(database)/documents/users/$(userId));
+    }
+
+    // --- Entity Validation Blueprints (Synchronized with firebase-blueprint.json) ---
+    function isValidUserProfile(data, userId) {
+      return data.keys().hasAll([
+          'uid',
+          'displayName',
+          'email',
+          'preferredLanguage',
+          'preferredUnit',
+          'newsletterSubscribed',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid',
+          'displayName',
+          'email',
+          'preferredLanguage',
+          'preferredUnit',
+          'newsletterSubscribed',
+          'createdAt',
+          'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.uid == userId
+        && data.uid == request.auth.uid
+        && data.displayName is string && data.displayName.size() >= 1 && data.displayName.size() <= 100
+        && data.email is string && data.email.size() >= 3 && data.email.size() <= 200
+        && data.preferredLanguage in ['en', 'hi', 'ta', 'te', 'kn']
+        && data.preferredUnit in ['ft', 'm']
+        && data.newsletterSubscribed is bool
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidConfiguration(data, userId, configId) {
+      return data.keys().hasAll([
+          'id',
+          'userId',
+          'name',
+          'clientName',
+          'projectLocation',
+          'throwRatio',
+          'screenWidthMeters',
+          'throwDistanceMeters',
+          'aspectRatio',
+          'lightIntensity',
+          'ambientLighting',
+          'surfaceFinish',
+          'purpose',
+          'indiaHeat',
+          'indiaHumidity',
+          'indiaPower',
+          'mountingType',
+          'lensPresetId',
+          'notes',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'userId',
+          'name',
+          'clientName',
+          'projectLocation',
+          'throwRatio',
+          'screenWidthMeters',
+          'throwDistanceMeters',
+          'aspectRatio',
+          'lightIntensity',
+          'ambientLighting',
+          'surfaceFinish',
+          'purpose',
+          'indiaHeat',
+          'indiaHumidity',
+          'indiaPower',
+          'mountingType',
+          'lensPresetId',
+          'notes',
+          'createdAt',
+          'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.id == configId
+        && isValidId(data.userId)
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.name is string && data.name.size() >= 1 && data.name.size() <= 120
+        && data.clientName is string && data.clientName.size() <= 120
+        && data.projectLocation is string && data.projectLocation.size() <= 120
+        && data.throwRatio is number && data.throwRatio >= 0.15 && data.throwRatio <= 5.0
+        && data.screenWidthMeters is number && data.screenWidthMeters >= 0.5 && data.screenWidthMeters <= 12.0
+        && data.throwDistanceMeters is number && data.throwDistanceMeters >= 0.1 && data.throwDistanceMeters <= 30.0
+        && data.aspectRatio in ['16:9', '16:10', '2.35:1', '4:3']
+        && data.lightIntensity in ['dark', 'semi_lit', 'bright']
+        && data.ambientLighting in ['blackout', 'curtains', 'daylight_windows', 'overhead_led']
+        && data.surfaceFinish in ['matte_white', 'high_contrast_grey', 'alr_clr', 'painted_wall']
+        && data.purpose in ['cinema', 'gaming', 'casual', 'all']
+        && data.indiaHeat in ['ac_controlled', 'moderate_fan', 'high_heat_non_ac']
+        && data.indiaHumidity in ['dry_dusty', 'moderate', 'coastal_monsoon']
+        && data.indiaPower in ['online_ups', 'inverter_backup', 'frequent_fluctuation']
+        && data.mountingType in ['ceiling', 'table', 'shelf', 'ust_console']
+        && data.lensPresetId is string && data.lensPresetId.size() <= 64
+        && data.notes is string && data.notes.size() <= 1000
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidPriceWatch(data, userId, watchId) {
+      return data.keys().hasAll([
+          'id',
+          'userId',
+          'modelId',
+          'targetPriceInr',
+          'alertEnabled',
+          'notes',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'userId',
+          'modelId',
+          'targetPriceInr',
+          'alertEnabled',
+          'notes',
+          'createdAt',
+          'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.id == watchId
+        && isValidId(data.userId)
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.modelId is string && data.modelId.size() >= 1 && data.modelId.size() <= 80 && data.modelId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.targetPriceInr is number && data.targetPriceInr >= 5000 && data.targetPriceInr <= 5000000
+        && data.alertEnabled is bool
+        && data.notes is string && data.notes.size() <= 300
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidCartItem(data, userId, itemId) {
+      return data.keys().hasAll([
+          'id',
+          'userId',
+          'skuId',
+          'itemType',
+          'title',
+          'unitPriceInr',
+          'quantity',
+          'preferredRetailer',
+          'createdAt',
+          'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'id',
+          'userId',
+          'skuId',
+          'itemType',
+          'title',
+          'unitPriceInr',
+          'quantity',
+          'preferredRetailer',
+          'createdAt',
+          'updatedAt'
+        ])
+        && isValidId(data.id)
+        && data.id == itemId
+        && isValidId(data.userId)
+        && data.userId == userId
+        && data.userId == request.auth.uid
+        && data.skuId is string && data.skuId.size() >= 1 && data.skuId.size() <= 80 && data.skuId.matches('^[a-zA-Z0-9_\\-]+$')
+        && data.itemType in ['projector', 'screen', 'mount', 'ups']
+        && data.title is string && data.title.size() >= 1 && data.title.size() <= 140
+        && data.unitPriceInr is number && data.unitPriceInr >= 500 && data.unitPriceInr <= 5000000
+        && data.quantity is number && data.quantity >= 1 && data.quantity <= 25
+        && data.preferredRetailer is string && data.preferredRetailer.size() >= 1 && data.preferredRetailer.size() <= 80
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // --- Collection Rules ---
+    match /users/{userId} {
+      // Strictly owner-only read; no blanket list on users collection to isolate PII
+      allow get: if isOwner(userId) && isValidId(userId);
+      allow list: if false;
+
+      allow create: if isOwner(userId)
+        && isValidId(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+
+      allow update: if isOwner(userId)
+        && isValidId(userId)
+        && isValidUserProfile(incoming(), userId)
+        && incoming().uid == existing().uid
+        && incoming().email == existing().email
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && (
+          incoming().diff(existing()).affectedKeys().hasOnly(['preferredLanguage', 'preferredUnit', 'newsletterSubscribed', 'displayName', 'updatedAt'])
+        );
+
+      allow delete: if isOwner(userId) && isValidId(userId);
+
+      // Subcollection: Room & Throw Configurations
+      match /configurations/{configId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(configId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+
+        allow create: if isOwner(userId)
+          && isValidId(userId)
+          && isValidId(configId)
+          && isValidConfiguration(incoming(), userId, configId)
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && userProfileExists(userId);
+
+        allow update: if isOwner(userId)
+          && isValidId(userId)
+          && isValidId(configId)
+          && isValidConfiguration(incoming(), userId, configId)
+          && incoming().id == existing().id
+          && incoming().userId == existing().userId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            incoming().diff(existing()).affectedKeys().hasOnly([
+              'name',
+              'clientName',
+              'projectLocation',
+              'throwRatio',
+              'screenWidthMeters',
+              'throwDistanceMeters',
+              'aspectRatio',
+              'lightIntensity',
+              'ambientLighting',
+              'surfaceFinish',
+              'purpose',
+              'indiaHeat',
+              'indiaHumidity',
+              'indiaPower',
+              'mountingType',
+              'lensPresetId',
+              'notes',
+              'updatedAt'
+            ])
+          )
+          && userProfileExists(userId);
+
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(configId);
+      }
+
+      // Subcollection: Price-Drop Watchlist
+      match /priceWatches/{watchId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(watchId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+
+        allow create: if isOwner(userId)
+          && isValidId(userId)
+          && isValidId(watchId)
+          && isValidPriceWatch(incoming(), userId, watchId)
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && userProfileExists(userId);
+
+        allow update: if isOwner(userId)
+          && isValidId(userId)
+          && isValidId(watchId)
+          && isValidPriceWatch(incoming(), userId, watchId)
+          && incoming().id == existing().id
+          && incoming().userId == existing().userId
+          && incoming().modelId == existing().modelId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            incoming().diff(existing()).affectedKeys().hasOnly(['targetPriceInr', 'alertEnabled', 'notes', 'updatedAt'])
+          )
+          && userProfileExists(userId);
+
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(watchId);
+      }
+
+      // Subcollection: E-Commerce Extensible Cart / Quote Bag
+      match /cartItems/{itemId} {
+        allow get: if isOwner(userId) && isValidId(userId) && isValidId(itemId);
+        allow list: if isOwner(userId) && resource.data.userId == request.auth.uid;
+
+        allow create: if isOwner(userId)
+          && isValidId(userId)
+          && isValidId(itemId)
+          && isValidCartItem(incoming(), userId, itemId)
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && userProfileExists(userId);
+
+        allow update: if isOwner(userId)
+          && isValidId(userId)
+          && isValidId(itemId)
+          && isValidCartItem(incoming(), userId, itemId)
+          && incoming().id == existing().id
+          && incoming().userId == existing().userId
+          && incoming().skuId == existing().skuId
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && (
+            incoming().diff(existing()).affectedKeys().hasOnly(['quantity', 'preferredRetailer', 'unitPriceInr', 'updatedAt'])
+          )
+          && userProfileExists(userId);
+
+        allow delete: if isOwner(userId) && isValidId(userId) && isValidId(itemId);
+      }
+    }
+  }
+}
