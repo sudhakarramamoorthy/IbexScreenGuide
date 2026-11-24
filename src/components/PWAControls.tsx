@@ -38,10 +38,10 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
             <div className="flex items-start justify-between gap-4">
               <div>
                 <h3 className="text-base font-semibold text-slate-900">
-                  Install ProjectorGuide India
+                  Install Ibex Screen Guide on Mobile
                 </h3>
                 <p className="mt-1 text-xs text-slate-500">
-                  Run offline optical calculations on Android, iOS, or Desktop.
+                  Run full offline optical calculations on Android, iOS, or via Capacitor APK.
                 </p>
               </div>
               <button
@@ -56,6 +56,14 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
 
             <div className="mt-5 space-y-4 text-sm text-slate-700">
               <div className="pb-4 border-b border-slate-100">
+                <p className="font-medium text-slate-900">Instant Trial on Android (Chrome)</p>
+                <ol className="mt-1.5 space-y-1 text-xs text-slate-600 list-decimal list-inside">
+                  <li>Open the app URL in Chrome on your Android phone.</li>
+                  <li>Tap the <strong>three-dot menu</strong> in the top right and select <strong>Install app</strong>.</li>
+                  <li>Launches fullscreen like a native Android app with offline support.</li>
+                </ol>
+              </div>
+              <div className="pb-4 border-b border-slate-100">
                 <p className="font-medium text-slate-900">On iPhone / iPad (Safari)</p>
                 <ol className="mt-1.5 space-y-1 text-xs text-slate-600 list-decimal list-inside">
                   <li>Tap the <strong>Share</strong> icon in Safari&apos;s bottom toolbar.</li>
@@ -64,12 +72,10 @@ export const PWAInstallButton: React.FC<{ compact?: boolean }> = ({ compact = fa
                 </ol>
               </div>
               <div>
-                <p className="font-medium text-slate-900">On Android (Chrome / Edge)</p>
-                <ol className="mt-1.5 space-y-1 text-xs text-slate-600 list-decimal list-inside">
-                  <li>Open the browser menu (three dots) in the top right.</li>
-                  <li>Select <strong>Install app</strong> or <strong>Add to Home screen</strong>.</li>
-                  <li>Launch directly from your home screen with full offline calculator support.</li>
-                </ol>
+                <p className="font-medium text-slate-900">Standalone Android APK Build</p>
+                <p className="mt-1 text-xs text-slate-600">
+                  This project includes a pre-configured Capacitor Android project and GitHub Actions APK build workflow (<code className="font-mono">ANDROID_APK_GUIDE.md</code>).
+                </p>
               </div>
             </div>
 

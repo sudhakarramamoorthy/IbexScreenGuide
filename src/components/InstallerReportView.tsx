@@ -123,7 +123,7 @@ export const InstallerReportView: React.FC = () => {
         <header className="pb-5 border-b-2 border-slate-900 flex flex-col sm:flex-row sm:items-start justify-between gap-4">
           <div>
             <div className="text-xs font-semibold text-blue-700">
-              ProjectorGuide India · Professional Installer Site Sheet
+              Ibex Screen Guide · Professional Installer Site Sheet
             </div>
             <h2 className="mt-1 text-2xl font-bold text-slate-900">{config.name || 'Optical Installation Spec'}</h2>
             <div className="mt-1 text-xs text-slate-600">
@@ -327,7 +327,7 @@ export const InstallerReportView: React.FC = () => {
         )}
 
         <footer className="pt-4 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-400">
-          <span>Generated offline by ProjectorGuide India</span>
+          <span>Generated offline by Ibex Screen Guide</span>
           <span>https://projectorguideindia.substack.com/</span>
         </footer>
       </article>

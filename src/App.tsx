@@ -345,7 +345,7 @@ const DashboardShell: React.FC = () => {
 
         {/* Quiet Editorial Footer (No telemetry tickers) */}
         <footer className="no-print border-t border-slate-200 bg-white px-6 py-4 text-xs text-slate-500 flex flex-col sm:flex-row items-center justify-between gap-2 pb-16 lg:pb-4">
-          <span>© {new Date().getFullYear()} ProjectorGuide India · Offline-Ready Optical Tooling</span>
+          <span>© {new Date().getFullYear()} Ibex Screen Guide · Offline-Ready Optical Tooling</span>
           <div className="flex items-center gap-4">
             <button
               type="button"

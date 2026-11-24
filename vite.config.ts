@@ -21,10 +21,10 @@ export default defineConfig(() => {
         ],
         manifest: {
           id: '/',
-          name: 'ProjectorGuide India',
-          short_name: 'ProjGuide',
+          name: 'Ibex Screen Guide',
+          short_name: 'Ibex Guide',
           description:
-            'Precision projector throw distance calculator, India climate & power advisor, marketplace price-drop tracker, and installer PDF reports.',
+            'Precision projector throw distance calculator, India climate & power optical advisor, marketplace price-drop tracker, and installer PDF report generator.',
           theme_color: '#1D4ED8',
           background_color: '#F8FAFC',
           display: 'standalone',

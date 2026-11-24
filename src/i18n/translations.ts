@@ -72,7 +72,7 @@ export interface TranslationStrings {
 }
 
 const EN: TranslationStrings = {
-  brandTitle: 'ProjectorGuide India',
+  brandTitle: 'Ibex Screen Guide',
   navCalculator: 'Throw Calculator',
   navCatalog: 'India Catalog',
   navCompare: 'Compare Specs',
